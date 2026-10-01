@@ -67,12 +67,29 @@ class Serie
     generos.textContent = 'Generos: ' + this.genres.join(' / ');
 
     const boton = document.createElement('button');
-    boton.textContent = 'guardar';
-
     const serie = this;
+
+    if (Serie.estaGuardada(this.id)) 
+    {
+      boton.textContent = 'borrar';
+    } 
+    else 
+    {
+      boton.textContent = 'guardar';
+    }
+
     boton.addEventListener('click', function() 
     {
-      Serie.guardarSerie(serie);
+      if (Serie.estaGuardada(serie.id)) 
+      {
+        Serie.borrarSerie(serie.id);
+        boton.textContent = 'guardar';
+      } 
+      else 
+      {
+        Serie.guardarSerie(serie);
+        boton.textContent = 'borrar';
+      }
     });
 
     texto.appendChild(titulo);
@@ -84,5 +101,62 @@ class Serie
     card.appendChild(texto);
 
     return card;
+  }
+
+  static estaGuardada(id) 
+  {
+    const CLAVE = 'seriesGuardadas';
+
+    const guardadasRaw = localStorage.getItem(CLAVE);
+    const guardadas = guardadasRaw ? JSON.parse(guardadasRaw) : [];
+
+    return guardadas.some(function(s) 
+    {
+      return s.id === id;
+    });
+  }
+
+  static guardarSerie(serie) 
+  {
+    const CLAVE = 'seriesGuardadas';
+
+    const guardadasRaw = localStorage.getItem(CLAVE);
+    const guardadas = guardadasRaw ? JSON.parse(guardadasRaw) : [];
+
+    const yaExiste = guardadas.some(function(s) 
+    {
+      return s.id === serie.id;
+    });
+
+    if (yaExiste) 
+    {
+      return;
+    }
+
+    guardadas.push({
+      id: serie.id,
+      url: serie.url,
+      name: serie.name,
+      language: serie.language,
+      genres: serie.genres,
+      image: serie.image
+    });
+
+    localStorage.setItem(CLAVE, JSON.stringify(guardadas));
+  }
+
+  static borrarSerie(id) 
+  {
+    const CLAVE = 'seriesGuardadas';
+
+    const guardadasRaw = localStorage.getItem(CLAVE);
+    const guardadas = guardadasRaw ? JSON.parse(guardadasRaw) : [];
+
+    const filtradas = guardadas.filter(function(s) 
+    {
+      return s.id !== id;
+    });
+
+    localStorage.setItem(CLAVE, JSON.stringify(filtradas));
   }
 }
