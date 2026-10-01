@@ -48,6 +48,12 @@ class Serie
     poster.src = this.image;
     poster.alt = this.name;
 
+    const url = this.url;
+    poster.addEventListener('click', function() 
+    {
+      window.open(url, '_blank');
+    });
+
     const texto = document.createElement('div');
     texto.className = 'serie-info';
 
@@ -60,9 +66,19 @@ class Serie
     const generos = document.createElement('p');
     generos.textContent = 'Generos: ' + this.genres.join(' / ');
 
+    const boton = document.createElement('button');
+    boton.textContent = 'guardar';
+
+    const serie = this;
+    boton.addEventListener('click', function() 
+    {
+      Serie.guardarSerie(serie);
+    });
+
     texto.appendChild(titulo);
     texto.appendChild(idioma);
     texto.appendChild(generos);
+    texto.appendChild(boton);
 
     card.appendChild(poster);
     card.appendChild(texto);

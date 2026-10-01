@@ -1,6 +1,10 @@
-const IDS = [1, 2, 3, 4, 5, 6];
+const SERIES_POR_PAGINA = 6;
+
+let idInicio = 1;
 
 const contenedor = document.getElementById('series');
+const btnAnterior = document.getElementById('anterior');
+const btnSiguiente = document.getElementById('siguiente');
 
 async function traerSerie(id) 
 {
@@ -31,13 +35,14 @@ function crearSerieDesdeApi(datos)
   return serie;
 }
 
-async function cargarSeries() 
+async function cargarPagina() 
 {
   const series = [];
   
-  for (let i = 0; i < IDS.length; i++) 
+  for (let i = 0; i < SERIES_POR_PAGINA; i++) 
   {
-    const datos = await traerSerie(IDS[i]);
+    const id = idInicio + i;
+    const datos = await traerSerie(id);
     const serie = crearSerieDesdeApi(datos);
     series.push(serie);
   }
@@ -56,11 +61,49 @@ function mostrarSeries(series)
   });
 }
 
+async function paginaSiguiente() 
+{
+  idInicio = idInicio + SERIES_POR_PAGINA;
+  
+  try 
+  {
+    const series = await cargarPagina();
+    mostrarSeries(series);
+  } 
+  catch (error) 
+  {
+    console.error('Error en paginaSiguiente:', error);
+  }
+}
+
+async function paginaAnterior() 
+{
+  if (idInicio - SERIES_POR_PAGINA < 1) 
+  {
+    return;
+  }
+  
+  idInicio = idInicio - SERIES_POR_PAGINA;
+  
+  try 
+  {
+    const series = await cargarPagina();
+    mostrarSeries(series);
+  } 
+  catch (error) 
+  {
+    console.error('Error en paginaAnterior:', error);
+  }
+}
+
+btnSiguiente.addEventListener('click', paginaSiguiente);
+btnAnterior.addEventListener('click', paginaAnterior);
+
 document.addEventListener('DOMContentLoaded', async function() 
 {
   try 
   {
-    const series = await cargarSeries();
+    const series = await cargarPagina();
     mostrarSeries(series);
   } 
   catch (error) 
